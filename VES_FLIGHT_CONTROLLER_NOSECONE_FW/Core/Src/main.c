@@ -555,14 +555,31 @@ int main(void)
 	result = init_bmp390_1(&bmp390_1);
 	result = init_bmp390_2(&bmp390_2);
 
-//	result = init_flash(&flash, ERASE); //XXX use this once to erase the chip
 	result = Flash_Init();
+
 
 	if (result)
 	{
 		__asm("nop");
 	}
-	Flash_ChipErase();
+	uint8_t data[4];  // Buffer to hold 4 bytes from flash
+
+	    // Receive the first 4 bytes from flash
+	Flash_Read_float(0,data, 4);
+
+	    // Convert the byte array to float
+	float resulto;
+	memcpy(&resulto, data, sizeof(float));
+
+	if(resulto != 1.0){
+		Flash_ChipErase();
+
+		float_t flag = 1.0;
+		Flash_Write_float(0, (uint8_t*)&flag, 4);
+	}
+
+
+
 //	result = init_flash(&flash, BYPASS);//XXX use this everytime the chip does not need to be erased
 //	while(1){
 //
@@ -1317,7 +1334,7 @@ void FlashWrite(void *argument)
 			num2 = num_big_meas_stored_in_flash;
 			num3 = num_small_meas_stored_in_flash;
 
-			uint32_t addr = num2 * sizeof(sensor_data) + sizeof(sensor_data_2) * num3;
+			uint32_t addr = num2 * sizeof(sensor_data) + sizeof(sensor_data_2) * num3 + 4;
 
 			if(addr< 0x1000000){
 				for (int j = 0; j < FLASH_NUMBER_OF_STORE_EACH_TIME; j++) {

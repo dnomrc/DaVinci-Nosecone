@@ -198,7 +198,7 @@ uint8_t buffer[5];
 	// dataSize is 32 bit, spi_receive handles 16bit transfers, so I have to loop...
 	while (dataSize) {
 		data_to_transfer = ((dataSize>0xFFFF) ? 0xFFFF : (uint16_t)dataSize);
-		Flash_Receive(data, data_to_transfer);
+		Flash_Receive((uint8_t*)data, data_to_transfer);
 		data+=data_to_transfer;
 		dataSize-=data_to_transfer;
 	}
